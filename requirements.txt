@@ -1,0 +1,15 @@
+streamlit
+gradio-client
+python-dotenv
+#ffmpeg
+ffmpeg-python
+#python-ffmpeg
+numpy
+audio-recorder-streamlit
+SpeechRecognition
+huggingface_hub
+langchain
+Requests
+streamlit_chat
+gTTS
+googletrans==4.0.0-rc1
