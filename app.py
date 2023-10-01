@@ -28,6 +28,8 @@ import uuid
 st.set_page_config(page_title="Gradio App as API WAudio", layout="wide")
 st.subheader("Gradio+Streamlit+WAudio+WtMem : Life Enhancing with AI!")
 
+result=""
+
 css_file = "main.css"
 with open(css_file) as f:
     st.markdown("<style>{}</style>".format(f.read()), unsafe_allow_html=True)
