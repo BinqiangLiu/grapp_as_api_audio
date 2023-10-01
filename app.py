@@ -6,9 +6,27 @@ from dotenv import load_dotenv
 from pathlib import Path
 from streamlit.components.v1 import html
 load_dotenv()
+import numpy as np
+from audio_recorder_streamlit import audio_recorder
+import speech_recognition as sr
+import ffmpeg
+from gtts import gTTS
+from langchain import PromptTemplate, LLMChain
+from langchain.memory import StreamlitChatMessageHistory
+from streamlit_chat import message
+from langchain.chains import LLMChain
+from langchain.prompts import PromptTemplate
+from langchain.memory import ConversationBufferMemory
+from langchain.memory.chat_message_histories import StreamlitChatMessageHistory
+from streamlit.components.v1 import html
+from langchain import HuggingFaceHub
+import time
+import glob
+from googletrans import Translator
+import uuid
 
-st.set_page_config(page_title="Gradio App as API", layout="wide")
-st.subheader("Gradio+Streamlit+WtMem : Life Enhancing with AI!")
+st.set_page_config(page_title="Gradio App as API WAudio", layout="wide")
+st.subheader("Gradio+Streamlit+WAudio+WtMem : Life Enhancing with AI!")
 
 css_file = "main.css"
 with open(css_file) as f:
@@ -24,3 +42,40 @@ if user_query !="" and not user_query.strip().isspace() and not user_query == ""
         result = client.predict(user_query, api_name="/predict")
         st.write("AI Reponse: ")
         st.write(result)
+
+translator = Translator()
+def text_to_speech(input_language, output_language, text):
+    if text is None:
+        print("Input empty.")        
+    else:
+        translation = translator.translate(text, src=input_language, dest=output_language)
+        trans_text = translation.text
+        tts = gTTS(trans_text, lang=output_language, slow=False)
+#        trans_txt_tts_file_name = str(uuid.uuid4()) + ".mp3"
+        tts_file_name = str(uuid.uuid4()) + ".mp3"
+        tts.save(tts_file_name)                      
+#      st.audio(audio, format="audio/mpeg") 
+#      audio_bytes = tts_audio_file.read()
+        st.audio(tts_file_name, format="audio/mpeg")
+#        tts.save("translationresult.mp3")        
+#        tts_audio_file=tts.save(tts_file_name)        
+        return trans_text
+
+st.write("---")
+ai_response_audio = st.checkbox("语音播放AI助手回复", key="ai_audio_cbox")   
+if ai_response_audio:
+  out_lang = st.selectbox("请选择希望用来听AI回复的语言", ("English", "Chinese"), key="output_lang")
+  if out_lang == "English":
+    output_language = "en"
+  elif out_lang == "Chinese":
+    output_language = "zh-CN"
+  if result =="" or result.strip().isspace() or result == "" or result.strip() == ""  or result.isspace():
+    print("No AI Response Yet.")
+    st.write("请确认您已经向AI助手提问并获得回复。")
+  else:
+    in_lang_1 = st.selectbox("请确认AI助手输出内容的语言", ("Chinese", "English"), key="input_lang_1")
+    if in_lang_1 == "Chinese":
+        input_language_1 = "zh-CN"
+    elif in_lang_1 == "English":
+        input_language_1 = "en"    
+    output_text = text_to_speech(input_language_1, output_language, result)
